@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import {
@@ -42,10 +43,7 @@ const SellerNumberUpdate = () => {
     },
   });
 
-  console.log(
-    "Current Seller Number Data:",
-    currentNumberData.seller.whatsappNumber
-  );
+ 
 
   // Update seller number mutation
   const updateNumberMutation = useMutation({
@@ -171,7 +169,7 @@ const SellerNumberUpdate = () => {
                 <div className="flex items-center gap-2">
                   <Phone className="w-4 h-4 text-primary" />
                   <span className="font-mono text-sm bg-accent px-2 py-1 rounded">
-                    {currentNumberData?.seller.whatsappNumber || "Not set"}
+                    {currentNumberData?.seller?.whatsappNumber ?? "Not set"}
                   </span>
                 </div>
               )}
