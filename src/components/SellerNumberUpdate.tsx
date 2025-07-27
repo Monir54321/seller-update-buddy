@@ -1,6 +1,12 @@
 import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
@@ -8,7 +14,8 @@ import { Bot, Phone, Loader2, CheckCircle, AlertCircle } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
 interface SellerNumberResponse {
-  sellerNumber: string;
+  seller: any;
+  whatsappNumber: string;
 }
 
 const SellerNumberUpdate = () => {
@@ -17,10 +24,17 @@ const SellerNumberUpdate = () => {
   const queryClient = useQueryClient();
 
   // Fetch current seller number
-  const { data: currentNumberData, isLoading: isLoadingCurrent, error: currentError } = useQuery({
+  const {
+    data: currentNumberData,
+    isLoading: isLoadingCurrent,
+    error: currentError,
+  } = useQuery({
     queryKey: ["sellerNumber"],
     queryFn: async (): Promise<SellerNumberResponse> => {
-      const response = await fetch("http://localhost:3000/orders/get-seller-number");
+      const response = await fetch(
+        "https://digital-server1.onrender.com/orders/get-seller-number"
+      );
+
       if (!response.ok) {
         throw new Error("Failed to fetch seller number");
       }
@@ -28,21 +42,29 @@ const SellerNumberUpdate = () => {
     },
   });
 
+  console.log(
+    "Current Seller Number Data:",
+    currentNumberData.seller.whatsappNumber
+  );
+
   // Update seller number mutation
   const updateNumberMutation = useMutation({
     mutationFn: async (number: string) => {
-      const response = await fetch("http://localhost:3000/orders/update-number", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ sellerNumber: number }),
-      });
-      
+      const response = await fetch(
+        "https://digital-server1.onrender.com/orders/update-number",
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ whatsappNumber: number }),
+        }
+      );
+
       if (!response.ok) {
         throw new Error("Failed to update seller number");
       }
-      
+
       return response.json();
     },
     onSuccess: () => {
@@ -89,7 +111,8 @@ const SellerNumberUpdate = () => {
             Hi Mr Monir
           </CardTitle>
           <CardDescription className="text-base leading-relaxed">
-            I am your bot. Please change your seller number here. I am there to update this.
+            I am your bot. Please change your seller number here. I am there to
+            update this.
           </CardDescription>
         </CardHeader>
 
@@ -131,7 +154,9 @@ const SellerNumberUpdate = () => {
 
           <div className="pt-4 border-t border-border">
             <div className="flex items-center justify-between">
-              <span className="text-sm text-muted-foreground">Current Number:</span>
+              <span className="text-sm text-muted-foreground">
+                Current Number:
+              </span>
               {isLoadingCurrent ? (
                 <div className="flex items-center gap-2">
                   <Loader2 className="w-4 h-4 animate-spin" />
@@ -146,7 +171,7 @@ const SellerNumberUpdate = () => {
                 <div className="flex items-center gap-2">
                   <Phone className="w-4 h-4 text-primary" />
                   <span className="font-mono text-sm bg-accent px-2 py-1 rounded">
-                    {currentNumberData?.sellerNumber || "Not set"}
+                    {currentNumberData?.seller.whatsappNumber || "Not set"}
                   </span>
                 </div>
               )}
